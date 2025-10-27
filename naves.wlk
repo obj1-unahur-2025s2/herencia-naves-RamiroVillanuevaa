@@ -35,12 +35,15 @@ class Nave{
 
   method cargarCombustible(unaCantidad) {
     combustible = combustible + unaCantidad
+
   }
   method descargarCombustible(unaCantidad) {
-    combustible = combustible - unaCantidad
+    combustible = (combustible - unaCantidad).max(0)
   }
 
-  method prepararViaje() {
+  method prepararViaje() 
+
+  method accionAdicional(){
     self.cargarCombustible(30000)
     self.acelerar(5000)
   }
@@ -72,7 +75,7 @@ class NaveBaliza inherits Nave{
 
 
   override method prepararViaje() {
-    super()
+    self.accionAdicional()
     self.cambiarColorDeBaliza("verde")
     self.ponerseParaleloAlSol()
   }
@@ -110,7 +113,7 @@ class NavePasajeros inherits Nave{
   }
 
   override method prepararViaje() {
-    super()
+    self.accionAdicional()
     self.cargarRacionesDeComida(4 * cantidadDePasajeros)
     self.cargarRacionesDeBebida(6 * cantidadDePasajeros)
     self.acercarseUnPocoAlSol()
@@ -156,7 +159,7 @@ class NaveCombate inherits Nave{
   method emitioAlgunMensaje() = mensajes.size() > 0
 
   override method prepararViaje() {
-    super()
+    self.accionAdicional()
     self.ponerseVisible()
     self.replegarMisiles()
     self.acelerar(15000)

@@ -1,2 +1,7 @@
 import naves.*
 
+describe "test modelo basico" {
+  test "nave " {
+    
+  }
+}
