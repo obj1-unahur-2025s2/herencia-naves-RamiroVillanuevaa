@@ -48,7 +48,9 @@ class Nave{
     self.acelerar(5000)
   }
 
-  method estaTranquila() = combustible >= 4000 && velocidad <= 12000
+  method estaTranquila()
+  method condicionesParaLaTranquilidad() = combustible >= 4000 && velocidad <= 12000
+
   method recibirAmenaza() {
     self.escapar()
     self.avisar()
@@ -56,7 +58,9 @@ class Nave{
   method escapar()
   method avisar()
 
-  method estaDeRelajo() 
+  method estaDeRelajo() = self.estaTranquila() && self.tienePocaActividad()
+
+  method tienePocaActividad() 
 
 
 }
@@ -64,13 +68,13 @@ class Nave{
 
 class NaveBaliza inherits Nave{
   var colorDeBaliza
-  var cantidadDeCambiosDeBaliza = 0
+  var cambioDeColorAlgunaVez = false
 
   method colorDeBaliza() = colorDeBaliza 
 
   method cambiarColorDeBaliza(colorNuevo) {
     colorDeBaliza = colorNuevo
-    cantidadDeCambiosDeBaliza += 1
+    cambioDeColorAlgunaVez = true
   }
 
 
@@ -80,14 +84,18 @@ class NaveBaliza inherits Nave{
     self.ponerseParaleloAlSol()
   }
 
-    override method estaTranquila() = super() && colorDeBaliza != "rojo"
+  
+  override method estaTranquila() = self.condicionesParaLaTranquilidad() && (self.colorDeBaliza() != "rojo")
 
   
   override method escapar(){self.irHaciaElSol()} 
   override method avisar(){self.cambiarColorDeBaliza("rojo")}
 
-  override method estaDeRelajo() = cantidadDeCambiosDeBaliza == 0
+  override method tienePocaActividad() = not cambioDeColorAlgunaVez
 }
+
+
+
 
 class NavePasajeros inherits Nave{
   const cantidadDePasajeros
@@ -128,7 +136,9 @@ class NavePasajeros inherits Nave{
     self.descargarRacionesDeComida(1 * cantidadDePasajeros)
   }
 
-  override method estaDeRelajo() = cantidadTotalDeComidaServida < 50
+
+  override method estaTranquila() = self.condicionesParaLaTranquilidad()
+  override method tienePocaActividad() = cantidadTotalDeComidaServida < 50
 
 }
 
@@ -167,7 +177,7 @@ class NaveCombate inherits Nave{
 
   }
 
-  override method estaTranquila() = super() && not(misilesDesplegados)
+  override method estaTranquila() = self.condicionesParaLaTranquilidad() && not(misilesDesplegados)
 
   override method escapar() {
     1 .. 2(self.acercarseUnPocoAlSol())
@@ -177,17 +187,18 @@ class NaveCombate inherits Nave{
     self.emitirMensaje("Amenaza recibida")
   }
 
+  override method tienePocaActividad() = true
 
 
 }
 
  class NaveHospital inherits NavePasajeros{
-   var tieneQuirofanosPreparados
+   var quirofanosPreparados
 
-   method tieneQuirofanosPreparados() = tieneQuirofanosPreparados 
-   method habilitarQuirofano() {tieneQuirofanosPreparados = true}
-   method deshabilitarQuirofano() {tieneQuirofanosPreparados = false}
-   override method estaTranquila() = super() && not(tieneQuirofanosPreparados) 
+   method tieneQuirofanosPreparados() = quirofanosPreparados 
+   method habilitarQuirofano() {quirofanosPreparados = true}
+   method deshabilitarQuirofano() {quirofanosPreparados = false}
+   override method estaTranquila() = super() && not self.tieneQuirofanosPreparados()
    
    override method recibirAmenaza(){
     super()
@@ -198,7 +209,8 @@ class NaveCombate inherits Nave{
 
  class NaveDeCombateSigilosa inherits NaveCombate{
 
-   override method estaTranquila() = super() && not(self.estaInvisible())
+  override method estaTranquila() = super() && not(self.estaInvisible())
+  
   override method escapar(){
     super()
     self.desplegarMisiles()
